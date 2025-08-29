@@ -27,5 +27,13 @@ export const Database = {
     
     orders[index] = { ...orders[index], ...updates };
     return orders[index];
+  },
+
+  async deleteOrder(id: number): Promise<boolean> {
+    const index = orders.findIndex(order => order.id === id);
+    if (index === -1) return false;
+    
+    orders.splice(index, 1);
+    return true;
   }
 };
