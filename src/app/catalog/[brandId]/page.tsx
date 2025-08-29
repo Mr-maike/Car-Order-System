@@ -1,14 +1,16 @@
 import ModelsList from '@/components/catalog/ModelsList';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     brandId: string;
-  };
+  }>;
 }
 
-export default function BrandPage({ params }: PageProps) {
-  // Em uma implementação real, buscaríamos o nome da marca pela API
-  const brandName = `Marca ${params.brandId}`;
+export default async function BrandPage({ params }: PageProps) {
+  const { brandId } = await params;
+  const decodedBrandId = decodeURIComponent(brandId); // ✅ DECODE
+
+  const brandName = `Marca ${decodedBrandId}`;
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
@@ -22,7 +24,7 @@ export default function BrandPage({ params }: PageProps) {
           </p>
         </div>
         
-        <ModelsList brandId={params.brandId} brandName={brandName} />
+        <ModelsList brandId={decodedBrandId} brandName={brandName} />
       </div>
     </div>
   );

@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { fipeClient } from '@/lib/fipe/client';
 import Link from 'next/link';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 
 interface Year {
   codigo: string;
@@ -75,9 +77,9 @@ export default function YearsList({ brandId, modelId, brandName, modelName }: Ye
         {years.map((year) => (
           <Link
             key={year.codigo}
-            href={`/catalog/${brandId}/${modelId}/${year.codigo}`}
+            href={`/catalog/${encodeURIComponent(brandId)}/${encodeURIComponent(modelId)}/${encodeURIComponent(year.codigo)}`}
             className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow border border-gray-200"
-          >
+            >
             <h3 className="font-semibold text-gray-800">{year.nome}</h3>
             <p className="text-sm text-gray-500">Código: {year.codigo}</p>
           </Link>

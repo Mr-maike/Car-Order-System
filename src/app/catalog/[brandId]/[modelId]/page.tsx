@@ -1,16 +1,21 @@
 import YearsList from '@/components/catalog/YearsList';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     brandId: string;
     modelId: string;
-  };
+  }>;
 }
 
-export default function ModelPage({ params }: PageProps) {
-  // Em uma implementação real, buscaríamos os nomes pela API
-  const brandName = `Marca ${params.brandId}`;
-  const modelName = `Modelo ${params.modelId}`;
+export default async function ModelPage({ params }: PageProps) {
+  const { brandId, modelId } = await params;
+  
+  // ✅ DECODE DOS PARÂMETROS
+  const decodedBrandId = decodeURIComponent(brandId);
+  const decodedModelId = decodeURIComponent(modelId);
+
+  const brandName = `Marca ${decodedBrandId}`;
+  const modelName = `Modelo ${decodedModelId}`;
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
@@ -25,8 +30,8 @@ export default function ModelPage({ params }: PageProps) {
         </div>
         
         <YearsList 
-          brandId={params.brandId} 
-          modelId={params.modelId}
+          brandId={decodedBrandId}
+          modelId={decodedModelId}
           brandName={brandName}
           modelName={modelName}
         />

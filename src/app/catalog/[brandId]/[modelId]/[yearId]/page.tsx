@@ -1,14 +1,23 @@
 import VehicleDetails from '@/components/catalog/VehicleDetails';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     brandId: string;
     modelId: string;
     yearId: string;
-  };
+  }>;
 }
 
-export default function YearPage({ params }: PageProps) {
+export default async function YearPage({ params }: PageProps) {
+  const { brandId, modelId, yearId } = await params;
+  
+  // ✅ DECODE DOS PARÂMETROS
+  const decodedBrandId = decodeURIComponent(brandId);
+  const decodedModelId = decodeURIComponent(modelId);
+  const decodedYearId = decodeURIComponent(yearId);
+
+  console.log('Params recebidos:', { decodedBrandId, decodedModelId, decodedYearId });
+
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-4xl mx-auto">
@@ -22,9 +31,9 @@ export default function YearPage({ params }: PageProps) {
         </div>
         
         <VehicleDetails 
-          brandId={params.brandId}
-          modelId={params.modelId}
-          yearId={params.yearId}
+          brandId={decodedBrandId}
+          modelId={decodedModelId}
+          yearId={decodedYearId}
         />
       </div>
     </div>

@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { fipeClient } from '@/lib/fipe/client';
 import Link from 'next/link';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 
 interface VehicleDetails {
   Valor: string;
@@ -28,9 +30,18 @@ export default function VehicleDetails({ brandId, modelId, yearId }: VehicleDeta
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // ✅ VALIDAÇÃO DOS PARÂMETROS
+    if (!brandId || !modelId || !yearId || yearId === 'undefined') {
+      setError('Parâmetros inválidos para carregar o veículo');
+      setLoading(false);
+      return;
+    }
+
     const fetchVehicleDetails = async () => {
       try {
         setLoading(true);
+        console.log('Buscando detalhes com:', { brandId, modelId, yearId });
+        
         const data = await fipeClient.getVehicleDetails(brandId, modelId, yearId);
         setVehicle(data);
         setError(null);
@@ -45,35 +56,39 @@ export default function VehicleDetails({ brandId, modelId, yearId }: VehicleDeta
     fetchVehicleDetails();
   }, [brandId, modelId, yearId]);
 
+  // ✅ Loading state
   if (loading) {
     return (
       <div className="space-y-4">
-        <div className="bg-gray-200 h-8 w-64 rounded animate-pulse"></div>
-        <div className="bg-gray-200 h-6 w-48 rounded animate-pulse"></div>
-        <div className="bg-gray-200 h-6 w-32 rounded animate-pulse"></div>
-        <div className="bg-gray-200 h-6 w-40 rounded animate-pulse"></div>
+        <Skeleton variant="text" height={32} width={256} />
+        <Skeleton variant="text" height={24} width={192} />
+        <Skeleton variant="text" height={24} width={160} />
+        <Skeleton variant="text" height={24} width={180} />
       </div>
     );
   }
 
+  // ✅ Error state
   if (error) {
     return (
+      <ErrorMessage
+        title="Erro ao carregar veículo"
+        message={error}
+        onRetry={() => window.location.reload()}
+      />
+    );
+  }
+
+  // ✅ No vehicle found
+  if (!vehicle) {
+    return (
       <div className="text-center py-8">
-        <p className="text-red-500 mb-4">{error}</p>
-        <button
-          onClick={() => window.location.reload()}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-        >
-          Tentar Novamente
-        </button>
+        <p className="text-gray-600">Nenhum detalhe encontrado para este veículo.</p>
       </div>
     );
   }
 
-  if (!vehicle) {
-    return <div>Nenhum detalhe encontrado para este veículo.</div>;
-  }
-
+  // ✅ Success state
   return (
     <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
       <h2 className="text-2xl font-bold mb-4">Detalhes do Veículo</h2>
@@ -106,7 +121,7 @@ export default function VehicleDetails({ brandId, modelId, yearId }: VehicleDeta
       </div>
 
       <Link
-        href={`/orders/new?brand=${vehicle.Marca}&model=${vehicle.Modelo}&year=${vehicle.AnoModelo}&price=${vehicle.Valor}`}
+        href={`/orders/new?brand=${encodeURIComponent(vehicle.Marca)}&model=${encodeURIComponent(vehicle.Modelo)}&year=${vehicle.AnoModelo}&price=${encodeURIComponent(vehicle.Valor)}`}
         className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors"
       >
         📝 Criar Pedido com este Veículo
